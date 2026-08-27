@@ -1,9 +1,37 @@
-node_modules
-dist
-dist-ssr
-*.local
-.vscode
-.idea
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+dist-ssr/
+
+# Environment & secrets (never commit these)
+.env
+.env.local
+.env.production
+.env.development
+.env.*.local
+
+# IDE & Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
 .DS_Store
-coverage
-.vite
+Thumbs.db
+
+# Debug & logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Test coverage
+coverage/
+
+# Vite cache
+.vite/
+*.local

@@ -1,5 +1,5 @@
 /**
- * Valuation Predictor Service - Synthesizes reputation, event catalysts, tie-ups, and geopolitical alignment into value predictions.
+ * Valuation Predictor Service - Synthesizes reputation, event catalysts (upcoming & realized completed), tie-ups, and geopolitical alignment into value predictions.
  */
 
 import { calculateReputationMetrics } from './reputationService.js';
@@ -18,15 +18,16 @@ export function predictCompanyValue(company, customScenario = { catalystWeight: 
   const currentPrice = company.currentPrice;
   const { targetBasePrice, targetBullPrice, targetBearPrice, peRatio, revenueGrowthYoY } = company.valuation;
 
-  // Composite Vibe Multiplier calculated from reputation, catalysts, and geopolitics
+  // Composite Vibe Multiplier calculated from reputation, catalysts, realized boost, and geopolitics
   const vibeScore = reputationRes ? reputationRes.netVibeScore : 80;
   const catalystScore = eventsRes ? eventsRes.catalystImpactScore : 0;
+  const realizedBoost = eventsRes ? eventsRes.realizedCatalystScore : 0;
   const geoScore = geoRes ? geoRes.compositeGeopoliticalScore : 80;
 
-  // Composite factor calculation
+  // Composite factor calculation (including realized completed event impact)
   const compositeFactor = (
-    (vibeScore * 0.45) +
-    (catalystScore * 0.3 * (customScenario.catalystWeight || 1.0)) +
+    (vibeScore * 0.40) +
+    ((catalystScore + realizedBoost) * 0.35 * (customScenario.catalystWeight || 1.0)) +
     (geoScore * 0.25 * (customScenario.geoWeight || 1.0))
   );
 
@@ -38,7 +39,7 @@ export function predictCompanyValue(company, customScenario = { catalystWeight: 
   const trajectory = [
     { period: 'Current', price: currentPrice, sentiment: 'Base Market' },
     { period: '3 Months (Short Term Catalysts)', price: Number((currentPrice + (dynamicPredictedPrice - currentPrice) * 0.3).toFixed(2)), sentiment: eventsRes.catalystOutlook },
-    { period: '6 Months (Mid Term Rollout)', price: Number((currentPrice + (dynamicPredictedPrice - currentPrice) * 0.65).toFixed(2)), sentiment: reputationRes.reputationTier },
+    { period: '6 Months (Mid Term Rollout)', price: Number((currentPrice + (dynamicPredictedPrice - currentPrice) * 0.65).toFixed(2)), sentiment: reputationRes ? reputationRes.reputationTier : 'Stable' },
     { period: '12 Months (Target Horizon)', price: dynamicPredictedPrice, sentiment: 'Vibe Target Price' },
     { period: '24 Months (Strategic Multi-Year)', price: Number((dynamicPredictedPrice * (1 + (catalystScore > 0 ? 0.15 : 0.05))).toFixed(2)), sentiment: 'Long Term Expansion' }
   ];

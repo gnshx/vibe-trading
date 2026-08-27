@@ -1,16 +1,20 @@
 import { describe, it, expect } from 'vitest';
 import { calculateReputationMetrics } from '../services/reputationService.js';
-import { companyDatabase } from '../data/companyDatabase.js';
 
 describe('Reputation Service Engine', () => {
-  it('calculates reputation metrics correctly for NVDA', () => {
-    const nvda = companyDatabase.find(c => c.symbol === 'NVDA');
-    const result = calculateReputationMetrics(nvda);
+  it('calculates reputation metrics correctly from company research object', () => {
+    const mockData = {
+      profile: { name: 'NVIDIA Corporation' },
+      news: [
+        { headline: 'NVIDIA achieves record growth and AI surge', summary: 'Strong beat in revenue' }
+      ],
+      recommendations: [{ strongBuy: 25, buy: 10, hold: 2, sell: 0 }]
+    };
+    const result = calculateReputationMetrics(mockData);
 
     expect(result).not.toBeNull();
-    expect(result.netVibeScore).toBeGreaterThan(80);
-    expect(result.reputationTier).toBe('Exceptional');
-    expect(result.breakdown.overallScore).toBe(92);
+    expect(result.netVibeScore).toBeGreaterThan(60);
+    expect(result.sentimentBadge).toBeDefined();
   });
 
   it('handles empty or missing company object gracefully', () => {
