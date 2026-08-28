@@ -8,8 +8,8 @@
   [![React](https://img.shields.io/badge/React_18-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
   [![Vite](https://img.shields.io/badge/Vite_6-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
   [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS_3-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
-  [![Build Status](https://img.shields.io/badge/Build-Passing-00E676?style=for-the-badge&logo=githubactions&logoColor=white)](https://github.com/gnshx/vibe-trading)
-  [![License](https://img.shields.io/badge/License-MIT-blue.style=for-the-badge)](LICENSE)
+  [![Build Status](https://img.shields.io/badge/Build-Passing-00E676?style=for-the-badge&logo=github&logoColor=white)](https://github.com/gnshx/vibe-trading)
+  [![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
 
   <br />
 
