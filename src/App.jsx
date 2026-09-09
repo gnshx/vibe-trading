@@ -23,7 +23,7 @@ export default function App() {
   
   // Primary Experience Tab ('ask' | 'explore' | 'radar' | 'simulate' | 'act' | 'ticker')
   const [primaryTab, setPrimaryTab] = useState('ask');
-  const [evidenceClaimId, setEvidenceClaimId] = useState<string | null>(null);
+  const [evidenceClaimId, setEvidenceClaimId] = useState(null);
 
   useEffect(() => {
     let isMounted = true;
