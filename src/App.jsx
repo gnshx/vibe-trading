@@ -14,20 +14,27 @@ import ValuationPredictionChart from './components/ValuationPredictionChart';
 import ConfidenceEvidenceModal from './components/ConfidenceEvidenceModal';
 import Logo from './components/Logo';
 import { Layers, Loader2, Sparkles, Building2 } from 'lucide-react';
-import { fetchLiveCompanyResearch } from './services/liveResearchEngine';
+import { fetchLiveCompanyResearch, getInitialCompanyResearch } from './services/liveResearchEngine';
 
 export default function App() {
   const [selectedSymbol, setSelectedSymbol] = useState('NVDA');
-  const [selectedCompany, setSelectedCompany] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [selectedCompany, setSelectedCompany] = useState(() => getInitialCompanyResearch('NVDA'));
+  const [isLoading, setIsLoading] = useState(false);
   
   // Primary Experience Tab ('ask' | 'explore' | 'radar' | 'simulate' | 'act' | 'ticker')
-  const [primaryTab, setPrimaryTab] = useState('ask');
+  const [primaryTab, setPrimaryTab] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('tab') || 'ask';
+  });
   const [evidenceClaimId, setEvidenceClaimId] = useState(null);
 
   useEffect(() => {
     let isMounted = true;
-    setIsLoading(true);
+    if (selectedCompany && selectedCompany.symbol === selectedSymbol) {
+      setIsLoading(false);
+    } else {
+      setIsLoading(true);
+    }
 
     fetchLiveCompanyResearch(selectedSymbol)
       .then((data) => {

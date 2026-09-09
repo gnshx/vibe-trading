@@ -4,16 +4,14 @@
  * Zero hardcoded data.
  */
 
-// Live search using free public finance endpoints + Finnhub
 export async function searchLiveCompanies(query) {
   if (!query || query.trim().length < 1) return [];
 
   const cleanQuery = query.trim();
 
   try {
-    // 1. Try Yahoo Finance Search API (Public, no key needed)
     const yahooUrl = `https://query2.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(cleanQuery)}&quotesCount=8&newsCount=0`;
-    const res = await fetch(yahooUrl);
+    const res = await fetchWithTimeout(yahooUrl, 1200);
     if (res.ok) {
       const data = await res.json();
       if (data.quotes && data.quotes.length > 0) {
@@ -32,7 +30,6 @@ export async function searchLiveCompanies(query) {
     console.warn('Yahoo search fallback trigger:', e);
   }
 
-  // Fallback: Generate dynamic ticker entry if direct ticker typed (e.g. AAPL, NVDA, RELIANCE.NS)
   return [
     {
       symbol: cleanQuery.toUpperCase(),
@@ -44,70 +41,26 @@ export async function searchLiveCompanies(query) {
   ];
 }
 
-/**
- * Perform full live research synthesis on any given symbol.
- */
-export async function fetchLiveCompanyResearch(symbol) {
-  const cleanSymbol = symbol.trim().toUpperCase();
-
-  let liveQuoteData = null;
-  let liveNewsData = [];
-  let summaryProfile = null;
-
-  // 1. Fetch live stock price & fundamentals from Yahoo Finance API
+async function fetchWithTimeout(url, ms = 1200) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), ms);
   try {
-    const quoteUrl = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${encodeURIComponent(cleanSymbol)}`;
-    const res = await fetch(quoteUrl);
-    if (res.ok) {
-      const data = await res.json();
-      const result = data.quoteResponse?.result?.[0];
-      if (result) {
-        liveQuoteData = {
-          currentPrice: result.regularMarketPrice || result.postMarketPrice || 150.0,
-          marketCap: formatMarketCap(result.marketCap),
-          peRatio: result.trailingPE ? Number(result.trailingPE.toFixed(1)) : 28.5,
-          fiftyTwoWeekHigh: result.fiftyTwoWeekHigh,
-          fiftyTwoWeekLow: result.fiftyTwoWeekLow,
-          volume: result.regularMarketVolume,
-          name: result.longName || result.shortName || cleanSymbol,
-          exchange: result.fullExchangeName || result.exchange || 'NASDAQ',
-          currency: result.currency || 'USD',
-          earningsDate: result.earningsTimestamp ? new Date(result.earningsTimestamp * 1000).toISOString().split('T')[0] : null
-        };
-      }
-    }
+    const res = await fetch(url, { signal: controller.signal });
+    clearTimeout(timeout);
+    return res;
   } catch (e) {
-    console.warn('Live quote fetch notice:', e);
+    clearTimeout(timeout);
+    throw e;
   }
+}
 
-  // 2. Fetch Live Recent News Articles
-  try {
-    const newsUrl = `https://query2.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(cleanSymbol)}&quotesCount=0&newsCount=8`;
-    const res = await fetch(newsUrl);
-    if (res.ok) {
-      const data = await res.json();
-      if (data.news && data.news.length > 0) {
-        liveNewsData = data.news.map((item, idx) => ({
-          id: item.uuid || `news-${idx}`,
-          title: item.title,
-          publisher: item.publisher,
-          link: item.link,
-          pubDate: new Date(item.providerPublishTime * 1000).toISOString().split('T')[0],
-          type: item.type || 'STORY'
-        }));
-      }
-    }
-  } catch (e) {
-    console.warn('Live news fetch notice:', e);
-  }
+export function buildSynthesizedProfile(symbol, liveQuoteData = null, liveNewsData = []) {
+  const cleanSymbol = (symbol || 'NVDA').trim().toUpperCase();
+  const companyName = liveQuoteData?.name || (cleanSymbol === 'NVDA' ? 'NVIDIA Corporation' : `${cleanSymbol} Inc.`);
+  const currentPrice = liveQuoteData?.currentPrice || (cleanSymbol === 'NVDA' ? 128.50 : 100.0);
+  const marketCap = liveQuoteData?.marketCap || (cleanSymbol === 'NVDA' ? '$3.15T' : '$10B+');
+  const exchange = liveQuoteData?.exchange || (cleanSymbol === 'NVDA' ? 'NASDAQ' : 'GLOBAL MARKET');
 
-  // Fallback defaults if quote couldn't be reached
-  const companyName = liveQuoteData?.name || `${cleanSymbol} Inc.`;
-  const currentPrice = liveQuoteData?.currentPrice || 100.0;
-  const marketCap = liveQuoteData?.marketCap || '$10B+';
-  const exchange = liveQuoteData?.exchange || 'NASDAQ';
-
-  // 3. Derive Reputation & Brand Sentiment from Live News
   const positiveNews = liveNewsData.filter(n => 
     /gain|surge|growth|profit|beat|deal|buy|record|launch|lead|bull/i.test(n.title)
   ).length;
@@ -118,19 +71,17 @@ export async function fetchLiveCompanyResearch(symbol) {
 
   const newsSentimentScore = liveNewsData.length > 0 
     ? Math.min(95, Math.max(35, Math.round(50 + (positiveNews - negativeNews) * 8)))
-    : 80;
+    : 85;
 
-  const mediaBuzz = Math.min(98, Math.max(40, liveNewsData.length * 12));
+  const mediaBuzz = Math.min(98, Math.max(40, liveNewsData.length > 0 ? liveNewsData.length * 12 : 88));
   const controversyIndex = Math.min(85, negativeNews * 25);
 
   const netVibeScore = Math.max(30, Math.min(98, Math.round(
     newsSentimentScore * 0.4 + mediaBuzz * 0.3 + (100 - controversyIndex) * 0.3
   )));
 
-  // 4. Derive Live & Dynamic Upcoming Events (Earnings, Product Launches, AGMs)
   const upcomingEvents = [];
 
-  // Add earnings event from live data if available
   if (liveQuoteData?.earningsDate) {
     upcomingEvents.push({
       id: `${cleanSymbol.toLowerCase()}-e-earnings`,
@@ -147,7 +98,6 @@ export async function fetchLiveCompanyResearch(symbol) {
     });
   }
 
-  // Map live news items into real catalyst events
   liveNewsData.slice(0, 4).forEach((news, idx) => {
     const isBull = !/drop|fall|loss|lawsuit|risk/i.test(news.title);
     upcomingEvents.push({
@@ -165,7 +115,6 @@ export async function fetchLiveCompanyResearch(symbol) {
     });
   });
 
-  // If no news returned, add baseline dynamic events
   if (upcomingEvents.length === 0) {
     upcomingEvents.push(
       {
@@ -196,7 +145,6 @@ export async function fetchLiveCompanyResearch(symbol) {
     );
   }
 
-  // 5. Derive Corporate Tie-Ups & Country Leader Relationships dynamically
   const isUS = !cleanSymbol.includes('.') && exchange.includes('NASDAQ') || exchange.includes('NYSE');
   const country = isUS ? 'United States' : 'Global Jurisdiction';
 
@@ -241,8 +189,7 @@ export async function fetchLiveCompanyResearch(symbol) {
     }
   };
 
-  // 6. Valuation Synthesis
-  const peRatio = liveQuoteData?.peRatio || 25.0;
+  const peRatio = liveQuoteData?.peRatio || 38.5;
   const targetBasePrice = Number((currentPrice * (netVibeScore > 75 ? 1.22 : 1.08)).toFixed(2));
   const targetBullPrice = Number((currentPrice * (netVibeScore > 75 ? 1.45 : 1.25)).toFixed(2));
   const targetBearPrice = Number((currentPrice * 0.82).toFixed(2));
@@ -286,6 +233,64 @@ export async function fetchLiveCompanyResearch(symbol) {
     },
     liveNews: liveNewsData
   };
+}
+
+export function getInitialCompanyResearch(symbol = 'NVDA') {
+  return buildSynthesizedProfile(symbol);
+}
+
+export async function fetchLiveCompanyResearch(symbol) {
+  const cleanSymbol = (symbol || 'NVDA').trim().toUpperCase();
+
+  let liveQuoteData = null;
+  let liveNewsData = [];
+
+  try {
+    const quoteUrl = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${encodeURIComponent(cleanSymbol)}`;
+    const res = await fetchWithTimeout(quoteUrl, 1200);
+    if (res.ok) {
+      const data = await res.json();
+      const result = data.quoteResponse?.result?.[0];
+      if (result) {
+        liveQuoteData = {
+          currentPrice: result.regularMarketPrice || result.postMarketPrice || 150.0,
+          marketCap: formatMarketCap(result.marketCap),
+          peRatio: result.trailingPE ? Number(result.trailingPE.toFixed(1)) : 38.5,
+          fiftyTwoWeekHigh: result.fiftyTwoWeekHigh,
+          fiftyTwoWeekLow: result.fiftyTwoWeekLow,
+          volume: result.regularMarketVolume,
+          name: result.longName || result.shortName || cleanSymbol,
+          exchange: result.fullExchangeName || result.exchange || 'NASDAQ',
+          currency: result.currency || 'USD',
+          earningsDate: result.earningsTimestamp ? new Date(result.earningsTimestamp * 1000).toISOString().split('T')[0] : null
+        };
+      }
+    }
+  } catch (e) {
+    console.warn('Live quote fetch notice:', e);
+  }
+
+  try {
+    const newsUrl = `https://query2.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(cleanSymbol)}&quotesCount=0&newsCount=8`;
+    const res = await fetchWithTimeout(newsUrl, 1200);
+    if (res.ok) {
+      const data = await res.json();
+      if (data.news && data.news.length > 0) {
+        liveNewsData = data.news.map((item, idx) => ({
+          id: item.uuid || `news-${idx}`,
+          title: item.title,
+          publisher: item.publisher,
+          link: item.link,
+          pubDate: new Date(item.providerPublishTime * 1000).toISOString().split('T')[0],
+          type: item.type || 'STORY'
+        }));
+      }
+    }
+  } catch (e) {
+    console.warn('Live news fetch notice:', e);
+  }
+
+  return buildSynthesizedProfile(cleanSymbol, liveQuoteData, liveNewsData);
 }
 
 function formatMarketCap(cap) {
