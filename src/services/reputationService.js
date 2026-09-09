@@ -26,7 +26,7 @@ function analyzeSentiment(text) {
 }
 
 export function calculateReputationMetrics(researchData) {
-  if (!researchData) return null;
+  if (!researchData || (!researchData.symbol && !researchData.profile && !researchData.name && (!researchData.news || researchData.news.length === 0))) return null;
 
   const { news = [], recommendations = [], financials, profile } = researchData;
 
