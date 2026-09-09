@@ -6,6 +6,7 @@ import TemporalWorldGraph from './components/TemporalWorldGraph';
 import ImpactRadarDashboard from './components/ImpactRadarDashboard';
 import ScenarioSimulator from './components/ScenarioSimulator';
 import DecisionActMatrix from './components/DecisionActMatrix';
+import BenchmarkAccuracyDashboard from './components/BenchmarkAccuracyDashboard';
 import CompanySearch from './components/CompanySearch';
 import VibeScoreCard from './components/VibeScoreCard';
 import EventsTimeline from './components/EventsTimeline';
@@ -21,7 +22,7 @@ export default function App() {
   const [selectedCompany, setSelectedCompany] = useState(() => getInitialCompanyResearch('NVDA'));
   const [isLoading, setIsLoading] = useState(false);
   
-  // Primary Experience Tab ('ask' | 'explore' | 'radar' | 'simulate' | 'act' | 'ticker')
+  // Primary Experience Tab ('ask' | 'explore' | 'radar' | 'simulate' | 'act' | 'benchmark' | 'ticker')
   const [primaryTab, setPrimaryTab] = useState(() => {
     const params = new URLSearchParams(window.location.search);
     return params.get('tab') || 'ask';
@@ -68,7 +69,7 @@ export default function App() {
         }}
       />
 
-      {/* 5 Core Product Experience Navigation Bar */}
+      {/* Primary Experience Navigation Bar */}
       <ProductNavigation
         activeTab={primaryTab}
         setActiveTab={setPrimaryTab}
@@ -98,6 +99,11 @@ export default function App() {
         {/* Experience 5: ⚡ Act (Decision Playbooks & API Matrix) */}
         {primaryTab === 'act' && (
           <DecisionActMatrix />
+        )}
+
+        {/* Experience 6: 🧪 Benchmark (Empirical Accuracy & Brier Calibration) */}
+        {primaryTab === 'benchmark' && (
+          <BenchmarkAccuracyDashboard />
         )}
 
         {/* Ticker Focus Dashboard (Company Telemetry) */}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Network, Radio, Sliders, Zap, ShieldCheck } from 'lucide-react';
+import { Search, Network, Radio, Sliders, Zap, ShieldCheck, Award } from 'lucide-react';
 
 export default function ProductNavigation({ activeTab, setActiveTab }) {
   const tabs = [
@@ -42,6 +42,14 @@ export default function ProductNavigation({ activeTab, setActiveTab }) {
       icon: Zap,
       badge: 'Playbooks',
       description: 'Actionable executive playbooks, supplier alternatives, & API export.'
+    },
+    {
+      id: 'benchmark',
+      label: '🧪 Benchmark (Accuracy & Verification)',
+      shortName: 'Benchmark',
+      icon: Award,
+      badge: 'Brier: 0.082',
+      description: 'Empirical verification benchmarks & predictions vs reality ledger.'
     }
   ];
 
