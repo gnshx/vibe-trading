@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Network, Filter, Clock, Eye, Sparkles, ChevronRight, Layers, MapPin, AlertTriangle, ShieldCheck } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Network, Filter, Clock, Eye, MapPin, Layers, ArrowRight, ShieldCheck, Zap } from 'lucide-react';
 import { INITIAL_WORLD_GRAPH } from '../services/worldGraphEngine';
 
 export default function TemporalWorldGraph() {
@@ -67,7 +68,7 @@ export default function TemporalWorldGraph() {
                 : 'bg-slate-800/60 text-slate-400 hover:text-slate-200 border border-transparent'
             }`}
           >
-            {filter === 'all' ? 'All (18 Nodes)' : filter.replace('_', ' ')}
+            {filter === 'all' ? 'All Nodes' : filter.replace('_', ' ')}
           </button>
         ))}
       </div>
@@ -83,39 +84,47 @@ export default function TemporalWorldGraph() {
 
           {/* Node Grid Visualization */}
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 my-12 relative z-10">
-            {filteredNodes.map((node) => {
-              const isSelected = selectedNode?.id === node.id;
-              let nodeColor = 'bg-slate-900 border-slate-800 text-slate-300';
-              if (node.type === 'event') nodeColor = 'bg-rose-950/40 border-rose-500/40 text-rose-300 hover:bg-rose-900/60';
-              if (node.type === 'cause') nodeColor = 'bg-amber-950/40 border-amber-500/40 text-amber-300 hover:bg-amber-900/60';
-              if (node.type === 'entity') nodeColor = 'bg-cyan-950/40 border-cyan-500/40 text-cyan-300 hover:bg-cyan-900/60';
-              if (node.type === 'supply_chain') nodeColor = 'bg-indigo-950/40 border-indigo-500/40 text-indigo-300 hover:bg-indigo-900/60';
-              if (node.type === 'product') nodeColor = 'bg-emerald-950/40 border-emerald-500/40 text-emerald-300 hover:bg-emerald-900/60';
+            <AnimatePresence>
+              {filteredNodes.map((node) => {
+                const isSelected = selectedNode?.id === node.id;
+                let nodeColor = 'bg-slate-900 border-slate-800 text-slate-300';
+                if (node.type === 'event') nodeColor = 'bg-rose-950/40 border-rose-500/40 text-rose-300 hover:bg-rose-900/60';
+                if (node.type === 'cause') nodeColor = 'bg-amber-950/40 border-amber-500/40 text-amber-300 hover:bg-amber-900/60';
+                if (node.type === 'entity') nodeColor = 'bg-cyan-950/40 border-cyan-500/40 text-cyan-300 hover:bg-cyan-900/60';
+                if (node.type === 'supply_chain') nodeColor = 'bg-indigo-950/40 border-indigo-500/40 text-indigo-300 hover:bg-indigo-900/60';
+                if (node.type === 'product') nodeColor = 'bg-emerald-950/40 border-emerald-500/40 text-emerald-300 hover:bg-emerald-900/60';
 
-              return (
-                <button
-                  key={node.id}
-                  onClick={() => setSelectedNode(node)}
-                  className={`p-3.5 rounded-2xl border text-left transition-all duration-200 ${nodeColor} ${
-                    isSelected ? 'ring-2 ring-cyan-400 scale-105 shadow-xl shadow-cyan-500/20' : 'hover:scale-102'
-                  }`}
-                >
-                  <div className="text-[10px] uppercase font-bold tracking-wider opacity-70 mb-1">
-                    {node.type.replace('_', ' ')}
-                  </div>
-                  <div className="text-xs font-extrabold truncate">{node.label}</div>
-                  {node.geography && (
-                    <div className="text-[10px] opacity-80 mt-1 flex items-center gap-1">
-                      <MapPin className="w-3 h-3 text-cyan-400" />
-                      <span>{node.geography}</span>
+                return (
+                  <motion.button
+                    key={node.id}
+                    layout
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    whileHover={{ scale: 1.04 }}
+                    whileTap={{ scale: 0.96 }}
+                    onClick={() => setSelectedNode(node)}
+                    className={`p-3.5 rounded-2xl border text-left transition-all duration-200 ${nodeColor} ${
+                      isSelected ? 'ring-2 ring-cyan-400 scale-105 shadow-xl shadow-cyan-500/20' : ''
+                    }`}
+                  >
+                    <div className="text-[10px] uppercase font-bold tracking-wider opacity-70 mb-1">
+                      {node.type.replace('_', ' ')}
                     </div>
-                  )}
-                </button>
-              );
-            })}
+                    <div className="text-xs font-extrabold truncate">{node.label}</div>
+                    {node.geography && (
+                      <div className="text-[10px] opacity-80 mt-1 flex items-center gap-1">
+                        <MapPin className="w-3 h-3 text-cyan-400" />
+                        <span>{node.geography}</span>
+                      </div>
+                    )}
+                  </motion.button>
+                );
+              })}
+            </AnimatePresence>
           </div>
 
-          <div className="flex items-center justify-between text-xs text-slate-400 border-t border-slate-900 pt-3">
+          <div className="flex items-center justify-between text-xs text-slate-400 border-t border-slate-900 pt-3 font-mono">
             <span>Graph Nodes: {filteredNodes.length}</span>
             <span>Causal Edges: {INITIAL_WORLD_GRAPH.edges.length}</span>
             <span>Temporal View: {temporalState.toUpperCase()}</span>
@@ -133,7 +142,13 @@ export default function TemporalWorldGraph() {
           </div>
 
           {selectedNode ? (
-            <div className="space-y-4">
+            <motion.div
+              key={selectedNode.id}
+              initial={{ opacity: 0, x: 10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.2 }}
+              className="space-y-4"
+            >
               <div>
                 <h4 className="text-lg font-black text-white">{selectedNode.label}</h4>
                 {selectedNode.description && (
@@ -179,7 +194,7 @@ export default function TemporalWorldGraph() {
                   })}
                 </div>
               </div>
-            </div>
+            </motion.div>
           ) : (
             <div className="text-center py-12 text-slate-500 text-xs">
               Click any node on the graph canvas to inspect properties & evidence.
@@ -190,3 +205,4 @@ export default function TemporalWorldGraph() {
     </div>
   );
 }
+

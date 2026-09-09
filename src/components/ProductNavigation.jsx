@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { Search, Network, Radio, Sliders, Zap, ShieldCheck, Award } from 'lucide-react';
 
 export default function ProductNavigation({ activeTab, setActiveTab }) {
@@ -6,7 +7,7 @@ export default function ProductNavigation({ activeTab, setActiveTab }) {
     {
       id: 'ask',
       label: '🎯 Ask (Decision Search)',
-      shortName: 'Ask',
+      shortName: 'Ask Engine',
       icon: Search,
       badge: 'Causal Engine',
       description: 'Search downstream causal effects, product exposures, & evidence chains.'
@@ -54,30 +55,39 @@ export default function ProductNavigation({ activeTab, setActiveTab }) {
   ];
 
   return (
-    <div className="w-full bg-slate-900/80 backdrop-blur-md border-b border-cyan-500/20 sticky top-0 z-40 px-4 py-2">
+    <div className="w-full bg-slate-900/80 backdrop-blur-md border-b border-cyan-500/20 sticky top-16 z-40 px-4 py-2">
       <div className="max-w-7xl mx-auto flex items-center justify-between overflow-x-auto gap-2 scrollbar-none">
-        <div className="flex items-center gap-1.5 min-w-max">
+        <div className="flex items-center gap-1.5 min-w-max relative">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
             return (
-              <button
+              <motion.button
                 key={tab.id}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all duration-200 ${
+                className={`relative flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all duration-200 ${
                   isActive
-                    ? 'bg-gradient-to-r from-cyan-500/20 via-blue-500/20 to-indigo-500/20 text-cyan-300 border border-cyan-400/40 shadow-lg shadow-cyan-500/10'
+                    ? 'text-cyan-300 border border-cyan-400/50 shadow-lg shadow-cyan-500/10'
                     : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent'
                 }`}
               >
-                <Icon className={`w-4 h-4 ${isActive ? 'text-cyan-400 animate-pulse' : 'text-slate-400'}`} />
-                <span>{tab.shortName}</span>
-                <span className={`px-1.5 py-0.5 rounded-full text-[10px] uppercase font-bold tracking-wider ${
+                {isActive && (
+                  <motion.div
+                    layoutId="activeTabPill"
+                    className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 via-blue-500/20 to-indigo-500/20 rounded-xl"
+                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  />
+                )}
+                <Icon className={`w-4 h-4 z-10 ${isActive ? 'text-cyan-400' : 'text-slate-400'}`} />
+                <span className="z-10">{tab.shortName}</span>
+                <span className={`z-10 px-1.5 py-0.5 rounded-full text-[10px] uppercase font-bold tracking-wider ${
                   isActive ? 'bg-cyan-500/30 text-cyan-200 border border-cyan-400/30' : 'bg-slate-800 text-slate-400'
                 }`}>
                   {tab.badge}
                 </span>
-              </button>
+              </motion.button>
             );
           })}
         </div>
@@ -90,3 +100,4 @@ export default function ProductNavigation({ activeTab, setActiveTab }) {
     </div>
   );
 }
+

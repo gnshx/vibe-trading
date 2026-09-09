@@ -10,8 +10,8 @@ World Event → Cause → Dependency → Supply Chain → Market → Company →
 [![Brier Calibration Score](https://img.shields.io/badge/Brier_Score-0.0820_(Gold_Standard)-00E676?style=flat-square&logo=chartdotjs&logoColor=white)](docs/evaluation.md)
 [![Entity Precision](https://img.shields.io/badge/Entity_Precision-97.2%25-61DAFB?style=flat-square)](docs/evaluation.md)
 [![7-Level Impact Precision](https://img.shields.io/badge/7--Level_Precision-87.3%25-646CFF?style=flat-square)](docs/evaluation.md)
+[![Framer Motion](https://img.shields.io/badge/Framer_Motion-11.x-E10098?style=flat-square&logo=framer&logoColor=white)](https://www.framer.com/motion/)
 [![React](https://img.shields.io/badge/React-18.3.1-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
-[![Vite](https://img.shields.io/badge/Vite-6.0.5-646CFF?style=flat-square&logo=vite&logoColor=white)](https://vitejs.dev/)
 [![Build Status](https://img.shields.io/badge/Build-Passing-00E676?style=flat-square&logo=github&logoColor=white)](https://github.com/gnshx/vibe-trading)
 
 [🌐 **Live Application**](https://vibe-trading-virid.vercel.app/) • [📖 **Systems Architecture**](docs/architecture.md) • [🧪 **Benchmark Suite**](docs/evaluation.md) • [🛡️ **Red-Team Failure Audit**](docs/red-team.md)
@@ -21,26 +21,36 @@ World Event → Cause → Dependency → Supply Chain → Market → Company →
 ## ⚡ 1-Minute Hero Causal Investigation Flow
 
 ```
-EVENT DETECTED: Brazil Drought Anomaly (Minas Gerais Basin)
+EVENT DETECTED: Taiwan Strait Maritime Defense Patrol Heightened
        │
        ▼
-WHY? Satellite moisture radar confirms 40-day precipitation deficit; harvest yield down 24%.
+WHY? Satellite imagery & naval directives confirm sub-3nm packaging substrate logistics disruption.
        │
        ▼
-WHO IS EXPOSED? Starbucks Corp (SBUX), Nestlé S.A. (NESN), Commercial Coffee Processors.
+WHO IS EXPOSED? TSMC Fab 18, Nvidia Corp (NVDA), ASML Holding N.V., Downstream OEMs.
        │
        ▼
-WHICH PRODUCTS? Packaged Ground Arabica Coffee, Cold Brew Bottled Inventory (+24% spot cost spike).
+WHICH PRODUCTS? NVDA H200 AI Accelerators, CoWoS Packaging Substrates (+38w lead time expansion).
        │
        ▼
-WHAT HAPPENS NEXT? Retail prices increase +14% in Month 4-8; inventory buffers absorb Month 1-3.
+WHAT HAPPENS NEXT? Data center GPU delivery schedules slip by 2 quarters; spot cloud prices surge +28%.
        │
        ▼
-WHAT IF IT GETS WORSE? If drought extends to 12 months, alternative suppliers capture 30% market share.
+WHAT IF IT GETS WORSE? If blockade extends past 90 days, global AI hardware CAPEX delays exceed $42B.
        │
        ▼
-WHAT SHOULD I DO? Lock in 12-month forward contracts to hedge COGS margins by ~8.5%.
+WHAT SHOULD I DO? Execute long collar hedging strategy (Buy NVDA $110 Puts / Sell $145 Calls).
 ```
+
+---
+
+## 🎨 UI/UX & High-Level System Features
+
+* 🌟 **Framer Motion Micro-Interactions:** Smooth page transition wrappers (`AnimatePresence`), spring layout tab indicators, hover scaling cards, and interactive modal overlays.
+* 📜 **Custom Sleek Dark Minimalist Scrollbars:** Ultra-thin custom slate Webkit & Firefox scrollbars tailored for high-density financial/intelligence viewports.
+* 📡 **Live Real-Time World Ingestion Stream (`LiveIngestionFeed.jsx`):** Continuous ticker stream ingesting global unstructured macroeconomic, supply chain, and geopolitical events into the graph in real-time.
+* 📄 **Executive Intelligence Briefing Exporter (`ExecutiveReportModal.jsx`):** One-click generation and download of institutional decision-ready Markdown briefing reports (`.md`) with complete evidence lineage.
+* 🕸️ **Interactive Node Canvas Explorer (`TemporalWorldGraph.jsx`):** Filterable 18+ node graph visualizer with live node inspection drawer, temporal state slider (`2024-25 Past`, `2026 Live`, `2027 Scenarios`), and directional causal edge confidence metrics.
 
 ---
 
@@ -105,16 +115,6 @@ Complete system specifications are organized into six technical design documents
                  Vibe Trading Engine (Finance)
 ```
 
-### Complete Experience Roster
-
-1. **🎯 Ask — Decision Search:** Natural language causal search, 7-level propagation breakdown (Level 1 Direct to Level 7 Strategic), and Product Exposure Matrix table.
-2. **🕸️ Explore — Temporal World Graph:** 18+ node / 17+ edge temporal graph, color-coded node canvas, temporal state slider (`2024-25 Past`, `2026 Live`, `2027 Scenarios`), and Node Inspector sidebar.
-3. **📡 Monitor — Impact Radar:** Autonomous disruption signal feed, real-time counters (1,420 entities, 8,450 products, 34,200 edges), and 8-Agent Swarm Status widget.
-4. **🎛️ Simulate — Scenario Simulator:** Parameterized Monte Carlo shock laboratory with interactive sliders for Shock Severity %, Duration Months, and Substitution Elasticity %.
-5. **⚡ Act — Executive Playbooks & API Layer:** Strategic playbooks for Procurement, IT, and Ocean Freight, JSON report exporter, and RESTful API endpoint schema.
-6. **🧪 Benchmark — Accuracy & Calibration:** Brier calibration score audit, prediction accuracy ledger, and historical prediction vs. reality verification.
-7. **Ticker Focus Dashboard:** Real-time stock telemetry, client-side Finnhub REST client with `localStorage` tokens, NLP keyword sentiment scorer, Recharts 24M trajectory projection chart, dual-horizon catalyst timeline, and sovereign risk alignment map.
-
 ---
 
 ## 💻 Quickstart & Verification
@@ -155,3 +155,4 @@ Distributed under the **MIT License**. See `LICENSE` for details.
 <div align="center">
   <sub>Engineered by <a href="https://github.com/gnshx">gnshx</a></sub>
 </div>
+
